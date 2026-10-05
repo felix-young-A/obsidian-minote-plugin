@@ -5,26 +5,12 @@
  */
 // 本文件改编自 Emac Shen 的 obsidian-minote-plugin（MIT 协议）。
 // 移动端适配改动：改用 normalizePath 与跨端 vault.adapter API，文件时间戳仅桌面端设置。
-import { normalizePath, Platform } from 'obsidian';
-import type { Vault, MetadataCache, DataAdapter } from 'obsidian';
+import { normalizePath } from 'obsidian';
+import type { Vault, MetadataCache } from 'obsidian';
 import { get } from 'svelte/store';
 
 import { settingsStore } from './settings';
-
-export const joinPath = (...parts: string[]) => parts.filter(Boolean).join('/');
-
-function setFileTimes(adapter: DataAdapter, fullPath: string, createDate: number, modifyDate: number) {
-	if (!Platform.isDesktopApp) {
-		return;
-	}
-
-	try {
-		const absolutePath = adapter.getFullPath(fullPath);
-		require('fs').utimesSync(absolutePath, createDate / 1000, modifyDate / 1000);
-	} catch (err) {
-		console.error('[minote plugin] failed to set file times', err);
-	}
-}
+import { joinPath, setFileTimes } from './utils';
 
 export default class FileManager {
 	private vault: Vault;
