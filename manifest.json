@@ -1,10 +1,10 @@
 {
 	"id": "minote-sync",
 	"name": "Minote Sync",
-	"version": "0.1.8",
+	"version": "0.2.0",
 	"minAppVersion": "0.15.0",
-	"description": "Sync Minote(小米笔记) into your vault.",
+	"description": "Sync Minote(小米笔记) into your vault. Mobile supported via cookie paste login.",
 	"author": "Emac Shen",
 	"authorUrl": "https://emacoo.cn",
-	"isDesktopOnly": true
+	"isDesktopOnly": false
 }
