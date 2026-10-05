@@ -1,3 +1,13 @@
+> 本仓库为 [obsidian-minote-plugin](https://github.com/emac/obsidian-minote-plugin) 的移动端适配分支（非官方）。
+>
+> 原插件作者：Emac Shen，MIT 协议。
+>
+> 本分支改动：
+> - 登录改为手动粘贴 Cookie 方案，替代 Electron 弹窗抓包（移动端无 Electron）
+> - 移除 Electron/Node 专属依赖（fs / path / BrowserWindow），改用 Obsidian 跨端 API
+> - manifest 设置 isDesktopOnly: false，移动端可正常加载
+> - 桌面端功能保持不变
+
 # Obsidian Plugin: 小米笔记同步插件
 
 [![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/emac/obsidian-minote-plugin/blob/master/LICENSE)
