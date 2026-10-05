@@ -1,12 +1,13 @@
 /**
- * @file 插件配置页面
- * @author Emac
+ * @file 插件配置页面（移动端适配）
+ * @author Emac（原作者），移动端适配：felix-young-A
  * @date 2025-01-05
  */
-import { PluginSettingTab, Setting, Notice, Platform } from 'obsidian';
-import type { App } from 'obsidian';
+// 本文件改编自 Emac Shen 的 obsidian-minote-plugin（MIT 协议）。
+// 移动端适配改动：去掉桌面端守卫、新增同步按钮、文件夹枚举改用跨端 API。
+import { PluginSettingTab, Setting, Notice } from 'obsidian';
+import type { App, TFolder } from 'obsidian';
 import { get } from 'svelte/store';
-import pickBy from 'lodash.pickby';
 
 import MinotePlugin from 'main';
 import { settingsStore } from './settings';
@@ -26,73 +27,73 @@ export class MinoteSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		const isCookieValid = get(settingsStore).isCookieValid;
-		if (Platform.isDesktopApp) {
-			if (isCookieValid) {
-				this.showLogout();
-			} else {
-				this.showLogin();
-			}
+		if (get(settingsStore).isCookieValid) {
+			this.showLogout();
+		} else {
+			this.showLogin();
 		}
 
+		this.syncActions();
 		this.notebookFolder();
 		this.advancedSettings();
 	}
 
 	private showLogin(): void {
-		document.createRange().createContextualFragment;
-		const desc = document.createRange().createContextualFragment(
-			`点击登录按钮，在弹出页面【扫码登录】`
-		);
-
 		new Setting(this.containerEl)
 			.setName('登录小米云服务')
-			.setDesc(desc)
+			.setDesc('使用浏览器登录小米云服务后，复制 Cookie 粘贴回插件完成登录（桌面端与移动端通用）')
 			.addButton((button) => {
 				return button
 					.setButtonText('登录')
 					.setCta()
-					.onClick(async () => {
-						button.setDisabled(true);
-						const loginModel = new MinoteLoginModel(this);
-						await loginModel.doLogin();
-						this.display();
+					.onClick(() => {
+						new MinoteLoginModel(this).open();
 					});
 			});
 	}
 
 	private showLogout(): void {
-		document.createRange().createContextualFragment;
-		const desc = document.createRange().createContextualFragment(
-			`1. 刷新Cookie：点击【刷新Cookie】按钮，在弹出页面点击【使用小米账号登录】<br>
-             2. 注销：点击【注销】按钮，在弹出页面右上角点击头像，下拉菜单选择【退出】`
-		);
-
 		new Setting(this.containerEl)
 			.setName(`小米云服务已登录，用户名：  ${get(settingsStore).user}`)
-			.setDesc(desc)
+			.setDesc('Cookie 失效时点击【刷新Cookie】重新粘贴；需要退出登录请点击【注销】')
 			.addButton((button) => {
 				return button
 					.setButtonText('刷新Cookie')
 					.setCta()
-					.onClick(async () => {
-						button.setDisabled(true);
-						const refreshCookieModel = new MinoteRefreshCookieModel(this);
-						await refreshCookieModel.doRefreshCookie();
-						this.display();
+					.onClick(() => {
+						new MinoteRefreshCookieModel(this).open();
 					});
 			})
 			.addButton((button) => {
 				return button
 					.setButtonText('注销')
+					.setWarning()
+					.onClick(() => {
+						new MinoteLogoutModel(this).open();
+					});
+			});
+	}
+
+	private syncActions(): void {
+		new Setting(this.containerEl)
+			.setName('同步操作')
+			.setDesc('增量同步只更新有变化的笔记；强制同步会全量覆盖更新（首次使用建议强制同步）')
+			.addButton((button) => {
+				return button
+					.setButtonText('增量同步')
 					.setCta()
-					.onClick(async () => {
-						button.setDisabled(true);
-						const logoutModel = new MinoteLogoutModel(this);
-						await logoutModel.doLogout();
-						this.display();
+					.onClick(() => {
+						this.plugin.startSync(false);
 					});
 			})
+			.addButton((button) => {
+				return button
+					.setButtonText('强制同步')
+					.setCta()
+					.onClick(() => {
+						this.plugin.startSync(true);
+					});
+			});
 	}
 
 	private notebookFolder(): void {
@@ -100,13 +101,16 @@ export class MinoteSettingTab extends PluginSettingTab {
 			.setName('笔记保存位置')
 			.setDesc('请选择Obsidian Vault中小米笔记存放的位置')
 			.addDropdown((dropdown) => {
-				const files = (this.app.vault.adapter as any).files;
-				const folders = pickBy(files, (val: any) => {
-					return val.type === 'folder';
-				});
-				Object.keys(folders).forEach((val) => {
-					dropdown.addOption(val, val);
-				});
+				this.app.vault
+					.getAllLoadedFiles()
+					.filter((file): file is TFolder => {
+						const folder = file as TFolder;
+						return folder.children !== undefined && folder.path !== '/';
+					})
+					.map((folder) => folder.path)
+					.forEach((path) => {
+						dropdown.addOption(path, path);
+					});
 
 				return dropdown
 					.setValue(get(settingsStore).noteLocation)
