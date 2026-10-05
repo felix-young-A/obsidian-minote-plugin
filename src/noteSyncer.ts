@@ -8,7 +8,8 @@
 import { get } from 'svelte/store';
 
 import { settingsStore } from './settings';
-import FileManager, { joinPath } from './fileManager';
+import FileManager from './fileManager';
+import { joinPath } from './utils';
 import MinoteApi from './minoteApi';
 import type { Note, Folder, SyncInfo, ImageInfo } from './models';
 
