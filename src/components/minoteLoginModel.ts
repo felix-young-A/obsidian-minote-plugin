@@ -43,21 +43,21 @@ export default class MinoteLoginModel extends Modal {
 		new Setting(contentEl)
 			.setName('Cookie')
 			.setDesc('粘贴小米云服务的 Cookie，多个键值对之间用分号加空格分隔')
-			.addTextArea((textArea) => {
+			.addTextArea((textArea) => (
+				textArea.setPlaceholder('粘贴 Cookie 到这里…'),
+				textArea.setValue(this.cookieValue),
+				textArea.onChange((value) => {
+					this.cookieValue = value.trim();
+				}),
 				textArea
-					.setPlaceholder('粘贴 Cookie 到这里…')
-					.setValue(this.cookieValue)
-					.onChange((value) => {
-						this.cookieValue = value.trim();
-					});
-			});
+			));
 
 		new Setting(contentEl)
 			.addButton((button) =>
 				button
 					.setButtonText('保存并验证')
 					.setCta()
-					.onClick(async () => {
+					onClick(async () => {
 						await this.saveCookie();
 					})
 			)
@@ -71,6 +71,7 @@ export default class MinoteLoginModel extends Modal {
 	}
 
 	async saveCookie() {
+		var data: any;
 		if (this.saving) {
 			return;
 		}
@@ -94,16 +95,15 @@ export default class MinoteLoginModel extends Modal {
 				}
 			});
 
-			const nickname = resp.status === 200 ? resp.json?.data?.nickname : undefined;
-			if (nickname) {
-				settingsStore.actions.setCookie(this.cookieValue);
-				settingsStore.actions.setUser(resp.json.data.nickname);
-				new Notice(`登录成功，用户名：${resp.json.data.nickname}`);
-				this.settingTab.display();
-				this.close();
-			} else {
-				new Notice('Cookie 无效或已过期，请重新登录后复制');
-			}
+			resp.status === 200 && ((data = resp.json?.data) != null && data.nickname)
+				? (
+					settingsStore.actions.setCookie(this.cookieValue),
+					settingsStore.actions.setUser(resp.json.data.nickname),
+					new Notice(`登录成功，用户名：${resp.json.data.nickname}`),
+					this.settingTab.display(),
+					this.close()
+				)
+				: new Notice('Cookie 无效或已过期，请重新登录后复制');
 		} catch (err) {
 			new Notice('验证失败，请检查网络或 Cookie 是否正确');
 			console.error('[minote plugin] failed to verify cookie', err);
