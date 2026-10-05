@@ -129,7 +129,7 @@ Open Obsidian settings, go to `Community plugins` on the left, click the `Turn o
 
 Incremental Sync: Click the Xiaomi notes button(![](/cloud-download.png)) in the left Ribbon, or use `command+P(windows ctrl+P)` to open Command Palette and search for `Minote` and choose the first option.
 
-Full Sync: Right-click the Xiaomi notes button(![](/cloud-download.png)) in the Ribbon and choose the second option, or use `command+P(windows ctrl+P)` to open Command Palette and search for `Minote` and choose the second option.
+Full Sync: Right-click the Xiaomi notes button(![](/cloud-download.png)) in the left Ribbon and choose the second option, or use `command+P(windows ctrl+P)` to open Command Palette and search for `Minote` and choose the second option.
 
 ## Known Issues
 - Cookie may expire after periods of inactivity, requiring manual refresh in plugin settings
