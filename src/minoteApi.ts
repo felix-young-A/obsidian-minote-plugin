@@ -30,10 +30,10 @@ export default class MinoteApi {
 		try {
 			return JSON.parse(text);
 		} catch (err) {
-			const preview = text.replace(/[^\x20-\x7E]/g, '\uFFFD').slice(0, 80);
 			const hex = Array.from(text.slice(0, 32))
 				.map((char) => char.charCodeAt(0).toString(16).padStart(2, '0'))
 				.join(' ');
+			const preview = text.replace(/[^\x20-\x7E]/g, '\uFFFD').slice(0, 80);
 			throw new Error(`${label}返回内容非JSON（预览: "${preview}"；前32字节hex: ${hex}）`);
 		}
 	}
