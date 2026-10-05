@@ -73,7 +73,7 @@ export default class FileManager {
 		setFileTimes(this.vault.adapter, fullPath, createDate, modifyDate);
 	}
 
-	async saveBinaryFile(filePath: string, ArrayBuffer) {
+	async saveBinaryFile(filePath: string, binary: ArrayBuffer) {
 		if (!filePath) {
 			return;
 		}
