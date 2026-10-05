@@ -6,7 +6,7 @@
 // 本文件改编自 Emac Shen 的 obsidian-minote-plugin（MIT 协议）。
 // 移动端适配改动：去掉桌面端守卫、新增同步按钮、文件夹枚举改用跨端 API。
 import { PluginSettingTab, Setting, Notice } from 'obsidian';
-import type { App, TFolder } from 'obsidian';
+import type { App } from 'obsidian';
 import { get } from 'svelte/store';
 
 import MinotePlugin from 'main';
@@ -103,12 +103,9 @@ export class MinoteSettingTab extends PluginSettingTab {
 			.addDropdown((dropdown) => {
 				this.app.vault
 					.getAllLoadedFiles()
-					.filter((file): file is TFolder => {
-						const folder = file as TFolder;
-						return folder.children !== undefined && folder.path !== '/';
-					})
-					.map((folder) => folder.path)
-					.forEach((path) => {
+					.filter((file: any) => file.children !== undefined && file.path !== '/')
+					.map((file: any) => file.path)
+					.forEach((path: string) => {
 						dropdown.addOption(path, path);
 					});
 
