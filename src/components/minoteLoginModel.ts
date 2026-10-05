@@ -57,7 +57,7 @@ export default class MinoteLoginModel extends Modal {
 				button
 					.setButtonText('保存并验证')
 					.setCta()
-					onClick(async () => {
+					.onClick(async () => {
 						await this.saveCookie();
 					})
 			)
