@@ -20,7 +20,7 @@ function setFileTimes(adapter: DataAdapter, fullPath: string, createDate: number
 
 	try {
 		const absolutePath = adapter.getFullPath(fullPath);
-		require('fs').utimesSync(absolutePath, createDate / 1000, createDate / 1000);
+		require('fs').utimesSync(absolutePath, createDate / 1000, modifyDate / 1000);
 	} catch (err) {
 		console.error('[minote plugin] failed to set file times', err);
 	}
