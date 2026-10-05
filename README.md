@@ -1,7 +1,50 @@
 # Obsidian Plugin: 小米笔记同步插件
 
+> 本仓库为 [obsidian-minote-plugin](https://github.com/emac/obsidian-minote-plugin) 的移动端适配分支（非官方）。
+> 原插件作者：Emac Shen，MIT 协议。
+> 本分支改动：
+> - 登录改为手动粘贴 Cookie 方案，替代 Electron 弹窗抓包（移动端无 Electron）
+> - 移除 Electron/Node 专属依赖（fs / path / BrowserWindow），改用 Obsidian 跨端 API
+> - manifest 设置 isDesktopOnly: false，移动端可正常加载
+> - 桌面端功能保持不变
+
+## 移动端使用方法（适配版新增）
+
+### 一、安装到 Obsidian 移动端
+
+插件文件夹为 `minote-sync`，包含 3 个文件：`main.js`、`manifest.json`、`versions.json`。放到 Vault 下的 `.obsidian/plugins/minote-sync/` 目录。
+
+- **Android**：文件管理器进入 Vault → `.obsidian/plugins/`（没有就新建）→ 新建 `minote-sync` 文件夹放入 3 个文件 → 回 Obsidian 设置 → 第三方插件 → 启用 Minote Sync。
+- **iOS**：用「文件」App 进入 `Vault/.obsidian/plugins/`（看不到 `.obsidian` 就开启“显示隐藏文件”）→ 新建 `minote-sync` 文件夹放入文件 → 回 Obsidian 启用；若看不到，退出 Obsidian 重进一次。
+- 也可在电脑 Obsidian 放好插件文件夹，再用 iCloud / 网盘把 Vault 同步到手机。
+
+### 二、登录（粘贴 Cookie）
+
+移动端没有 Electron，登录改为手动粘贴 Cookie，桌面端移动端通用：
+
+1. 电脑或手机浏览器打开 https://i.mi.com/note/h5，登录小米账号；
+2. 按 F12 打开开发者工具 → Application → Cookies → https://i.mi.com；
+3. 复制全部 Cookie（形如 `xxx=yyy; aaa=bbb` 的整段）；
+4. 回 Obsidian 设置 → Minote Sync → 登录 → 粘贴 → 保存并验证；
+5. 显示「登录成功 + 用户名」即完成。Cookie 失效时重复此流程或点「刷新Cookie」。
+
+### 三、同步
+
+- **增量同步**：左侧边栏云朵图标，或设置页「增量同步」按钮；
+- **强制同步**（首次使用建议）：设置页「强制同步」按钮，或命令面板输入 Minote 选择「强制同步小米笔记」。
+
+同步默认保存到 Vault 的 `minote/` 文件夹（设置里可改）。
+
+### 四、已知限制
+
+- 移动端无法设置文件时间戳（系统限制），不影响内容与增量同步；
+- 原版右键菜单的强制同步仅桌面端有效，移动端用设置页按钮或命令面板；
+- Cookie 为敏感凭据：保存在插件 `data.json` 中，请勿分享 Vault 数据；粘贴后请清空剪贴板；
+- 注销仅清理本地 Cookie，不会登出小米账号云端会话；
+- 保存 Cookie 前会先验证，验证失败不会清除已有有效 Cookie。
+
 [![GitHub license](https://badgen.net/github/license/Naereen/Strapdown.js)](https://github.com/emac/obsidian-minote-plugin/blob/master/LICENSE)
-[![Github all releases](https://img.shields.io/github/downloads/emac/obsidian-minote-plugin/total.svg)](https://GitHub.com/emac/obsidian-minote-plugin/releases)
+[![Github all releases](https://github.com/img.shields.io/github/downloads/emac/obsidian-minote-plugin/total.svg)](https://GitHub.com/emac/obsidian-minote-plugin/releases)
 [![GitLab latest release](https://badgen.net/github/release/emac/obsidian-minote-plugin/all)](https://github.com/emac/obsidian-minote-plugin/releases)
 
 Obsidian 小米笔记同步插件是一个社区插件，用来将[小米笔记](https://i.mi.com/note/h5#/)转换为 Markdown 格式保存到 Obsidian 指定的文件夹中。首次使用，如果笔记数量较多，更新会比较慢，后面再去更新的时候只会增量更新有变化的笔记，一般速度很快。
@@ -86,7 +129,7 @@ Open Obsidian settings, go to `Community plugins` on the left, click the `Turn o
 
 Incremental Sync: Click the Xiaomi notes button(![](/cloud-download.png)) in the left Ribbon, or use `command+P(windows ctrl+P)` to open Command Palette and search for `Minote` and choose the first option.
 
-Full Sync: Right-click the Xiaomi notes button(![](/cloud-download.png)) in the left Ribbon and choose the second option, or use `command+P(windows ctrl+P)` to open Command Palette and search for `Minote` and choose the second option.
+Full Sync: Right-click the Xiaomi notes button(![](/cloud-download.png)) in the Ribbon and choose the second option, or use `command+P(windows ctrl+P)` to open Command Palette and search for `Minote` and choose the second option.
 
 ## Known Issues
 - Cookie may expire after periods of inactivity, requiring manual refresh in plugin settings
