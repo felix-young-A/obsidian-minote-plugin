@@ -1,14 +1,15 @@
 /**
- * @file 笔记同步引擎
- * @author Emac
+ * @file 笔记同步引擎（移动端适配）
+ * @author Emac（原作者），移动端适配：felix-young-A
  * @date 2025-01-05
  */
+// 本文件改编自 Emac Shen 的 obsidian-minote-plugin（MIT 协议）。
+// 移动端适配改动：路径拼接改用跨端 joinPath，移除 Node 专属 path 依赖。
 import { get } from 'svelte/store';
 
 import { settingsStore } from './settings';
-import FileManager from './fileManager';
+import FileManager, { joinPath } from './fileManager';
 import MinoteApi from './minoteApi';
-import path from 'path';
 import type { Note, Folder, SyncInfo, ImageInfo } from './models';
 
 export default class NoteSyncer {
@@ -134,7 +135,7 @@ export default class NoteSyncer {
 					this.lastSyncedFolders[folder.id].name = folder.name;
 					// 更新笔记路径
 					for (const note of Object.values(this.lastSyncedNotes)) {
-						if (note.relativePath && note.relativePath.startsWith(oldFolderName + path.sep)) {
+						if (note.relativePath && note.relativePath.startsWith(oldFolderName + '/')) {
 							note.relativePath = note.relativePath.replace(oldFolderName, folder.name);
 						}
 					}
@@ -198,12 +199,12 @@ export default class NoteSyncer {
 					}
 
 					// 创建图片目录
-					const imgDir = path.join(folderPath, 'img');
+					const imgDir = joinPath(folderPath, 'img');
 					await this.fileManager.createFolder(imgDir, Date.now());
 
 					// 并行下载图片
 					for (const img of images) {
-						const imgPath = path.join(imgDir, `${img.fileId}.${img.fileType}`);
+						const imgPath = joinPath(imgDir, `${img.fileId}.${img.fileType}`);
 						downloadPromises.push(this.downloadImage(img.fileId, imgPath));
 					}
 				}
@@ -239,7 +240,7 @@ export default class NoteSyncer {
 				content = content.replace(/<new-format\/>/g, '');
 
 				// 保存转换后的内容
-				const notePath = path.join(folderPath, `${note.title}.md`);
+				const notePath = joinPath(folderPath, `${note.title}.md`);
 				await this.fileManager.saveFile(notePath, content, note.createDate, note.modifyDate);
 
 				syncedCount++;
